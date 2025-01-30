@@ -79,25 +79,33 @@ function App() {
     setCurrentData(weather);
   }
 
+  function addCity(city: City) {
+    let cities = [...savedCities];
+    cities.push(city);
+    setSavedCities(cities);
+  }
+
   return (
     <>
       <h1>Weather App</h1>
-      <h1>SelectedCity: {selectedCity?.name}</h1>
-      <div>
-        {matchedCities.map((city: City) => {
+      <h1>Selected City: {selectedCity?.name}</h1>
+      <div style={{ width: "100%", overflowX: "auto", whiteSpace: "nowrap" }}>
+        {savedCities.map((city) => {
           return (
-            <div
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                setSelectedCity(city);
-              }}
-            >
-              {city.name}, {city.state ? `${city.state}, ` : ""} {city.country}
-            </div>
+            <>
+              <button
+                className="mx-1 my-2"
+                onClick={() => {
+                  setSelectedCity(city);
+                }}
+              >
+                {city.name}
+              </button>
+            </>
           );
         })}
       </div>
-      Search for a city:
+      Search for a city to add:
       <input
         type="text"
         value={cityQuery}
@@ -106,15 +114,19 @@ function App() {
         }}
       />
       <div>
-        {savedCities.map((city) => {
+        {matchedCities.map((city: City) => {
           return (
-            <button
-              onClick={() => {
-                setSelectedCity(city);
-              }}
-            >
-              {city.name}
-            </button>
+            <div className="d-flex align-items-center">
+              {city.name}, {city.state ? `${city.state}, ` : ""} {city.country}
+              <button
+                className="btn btn-s"
+                onClick={() => {
+                  addCity(city);
+                }}
+              >
+                +
+              </button>
+            </div>
           );
         })}
       </div>
