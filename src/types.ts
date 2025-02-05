@@ -10,3 +10,8 @@ export interface City {
   latitude: number;
   longitude: number;
 }
+
+export interface ResultItemProps {
+  city: City;
+  addCity: Function;
+}

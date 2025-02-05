@@ -1,0 +1,25 @@
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #ddd;
+  width: 95%;
+  background-color: #f9f9f9;
+  padding: 0px 10px 0px 10px;
+}
+
+.result-item:hover {
+  background-color: #e0e0e0;
+}
+
+.button-list {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+.button-list button {
+  padding: 8px 8px 8px 8px;
+}
