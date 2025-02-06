@@ -3,6 +3,9 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { HourWeather, City } from "./types";
 import ResultItem from "./components/ResultItem";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
+import WeatherListItem from "./components/WeatherListItem";
 
 function App() {
   const [currentData, setCurrentData] = useState<HourWeather[]>([]);
@@ -42,7 +45,7 @@ function App() {
     setSelectedCityIndex(0);
     setSelectedCity(savedCities[0]);
     fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${savedCities[0]?.latitude}&longitude=${savedCities[0]?.longitude}&hourly=temperature_2m&temperature_unit=fahrenheit&timezone=auto`
+      `https://api.open-meteo.com/v1/forecast?latitude=${savedCities[0]?.latitude}&longitude=${savedCities[0]?.longitude}&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&timezone=auto&current=apparent_temperature&wind_speed_unit=mph&precipitation_unit=inch`
     )
       .then((response) => response.json())
       .then((data) => storeWeatherResults(data))
@@ -60,7 +63,7 @@ function App() {
 
   useEffect(() => {
     fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${selectedCity?.latitude}&longitude=${selectedCity?.longitude}&hourly=temperature_2m&temperature_unit=fahrenheit&timezone=auto`
+      `https://api.open-meteo.com/v1/forecast?latitude=${selectedCity?.latitude}&longitude=${selectedCity?.longitude}&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&timezone=auto&current=apparent_temperature&wind_speed_unit=mph&precipitation_unit=inch`
     )
       .then((response) => response.json())
       .then((data) => storeWeatherResults(data))
@@ -109,6 +112,10 @@ function App() {
         weather.push({
           date: new Date(data.hourly.time[i]),
           temperature: data.hourly.temperature_2m[i],
+          precip_prob: data.hourly.precipitation_probability[i],
+          precip_inches: data.hourly.precipitation[i],
+          wind_speed: data.hourly.wind_speed_10m[i],
+          wind_direction: data.hourly.wind_direction_10m[i],
         });
       }
     }
@@ -125,16 +132,19 @@ function App() {
     setCityQuery("");
   }
 
-  function scrollToButton(index: number, buttonRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>) {
+  function scrollToButton(
+    index: number,
+    buttonRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>
+  ) {
     const button = buttonRefs.current[index];
     if (button) {
       button.scrollIntoView({
         behavior: "smooth",
-        block: "center", 
+        block: "center",
         inline: "center",
       });
     }
-  };
+  }
 
   return (
     <>
@@ -155,7 +165,7 @@ function App() {
                 backgroundColor:
                   index === selectedCityIndex ? "#949494" : "lightgray",
               }}
-              ref={(el) => (cityButtonRefs.current[index] = el)} 
+              ref={(el) => (cityButtonRefs.current[index] = el)}
             >
               {city.name}
             </button>
@@ -197,55 +207,24 @@ function App() {
               setSelectedDay(day);
               scrollToButton(index, dayButtonRefs);
             }}
-            ref={(el) => (dayButtonRefs.current[index] = el)} 
+            ref={(el) => (dayButtonRefs.current[index] = el)}
           >
             {day}
           </button>
         ))}
       </div>
-      <div className="container">
-        <div className="row">
-          <div className="col-6 text-center">
-            {currentData.length > 0 ? <h5>Time</h5> : <></>}
-            {currentData
-              ?.filter(
-                (data: HourWeather) =>
-                  data.date.toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  }) == selectedDay
-              )
-              .map((hour: HourWeather) => {
-                return (
-                  <div>
-                    {hour.date.toLocaleTimeString("en-US", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
-                );
-              })}
-          </div>
-          <div className="col-6 text-center">
-            <div>
-              {currentData.length > 0 ? <h5>Temperature</h5> : <></>}
-              {currentData
-                ?.filter(
-                  (data: HourWeather) =>
-                    data.date.toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    }) == selectedDay
-                )
-                .map((hour: HourWeather) => {
-                  return <div>{hour.temperature} F</div>;
-                })}
-            </div>
-          </div>
-        </div>
-      </div>
+      {currentData
+        ?.filter(
+          (data: HourWeather) =>
+            data.date.toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            }) == selectedDay
+        )
+        .map((hour: HourWeather, index: number) => (
+          <WeatherListItem weather={hour} key={index} />
+        ))}
     </>
   );
 }
