@@ -3,9 +3,9 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { HourWeather, City } from "./types";
 import ResultItem from "./components/ResultItem";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import WeatherListItem from "./components/WeatherListItem";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function App() {
   const [currentData, setCurrentData] = useState<HourWeather[]>([]);
@@ -146,6 +146,18 @@ function App() {
     }
   }
 
+  function handleDeleteCity(index: number) {
+    const isConfirmed = window.confirm(`Are you sure you want to remove ${savedCities[index].name}?`);
+    if (isConfirmed) {
+      let cities: City[] = [...savedCities.slice(0, index), ...savedCities.slice(index + 1)]
+      setSavedCities(cities);
+      if (selectedCityIndex == index) {
+        setSelectedCityIndex(0);
+        setSelectedCity(cities[0]);
+      }
+    }
+  }
+
   return (
     <>
       <h1 style={{ padding: "4px", display: "flex", justifyContent: "center" }}>
@@ -167,7 +179,10 @@ function App() {
               }}
               ref={(el) => (cityButtonRefs.current[index] = el)}
             >
-              {city.name}
+              <FontAwesomeIcon onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering the button's click event
+            handleDeleteCity(index);
+          }} icon={faTrash} />&nbsp;&nbsp;{city.name}
             </button>
           );
         })}
@@ -197,7 +212,7 @@ function App() {
         })}
       </div>
       <div className="button-list">
-        {uniqueDays.map((day: string, index: number) => (
+        {savedCities.length > 0 ? uniqueDays.map((day: string, index: number) => (
           <button
             key={index}
             style={{
@@ -211,7 +226,7 @@ function App() {
           >
             {day}
           </button>
-        ))}
+        )) : <></>}
       </div>
       {currentData
         ?.filter(

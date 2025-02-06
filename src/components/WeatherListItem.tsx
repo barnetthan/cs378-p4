@@ -14,7 +14,7 @@ function WeatherListItem({ weather }: WeatherListItemProps) {
     >
       <div className="row align-items-center">
         <div className="col-3">
-          <h6>
+          <h6 style={{paddingLeft: "8px"}}>
             {weather.date.toLocaleTimeString("en-US", {
               hour: "numeric",
               hour12: true,
