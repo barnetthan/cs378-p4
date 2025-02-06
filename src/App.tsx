@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { HourWeather, City } from "./types";
@@ -12,6 +12,8 @@ function App() {
   const [selectedCity, setSelectedCity] = useState<City | null>();
   const [selectedCityIndex, setSelectedCityIndex] = useState<number>(-1);
   const [selectedDay, setSelectedDay] = useState<string>("");
+  const cityButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each city's button
+  const dayButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each day's button
   const [savedCities, setSavedCities] = useState<City[]>([
     {
       name: "Austin",
@@ -45,7 +47,7 @@ function App() {
       .then((response) => response.json())
       .then((data) => storeWeatherResults(data))
       .catch((error) => console.error("Error fetching data:", error));
-  }, [])
+  }, []);
 
   useEffect(() => {
     fetch(
@@ -81,6 +83,7 @@ function App() {
     }
     setUniqueDays(Array.from(days));
     setSelectedDay(Array.from(days)[0]);
+    scrollToButton(0, dayButtonRefs);
   }, [currentData]);
 
   function storeCityResults(data: any) {
@@ -110,6 +113,7 @@ function App() {
       }
     }
     setCurrentData(weather);
+    scrollToButton(selectedCityIndex, cityButtonRefs);
   }
 
   function addCity(city: City) {
@@ -121,23 +125,37 @@ function App() {
     setCityQuery("");
   }
 
+  function scrollToButton(index: number, buttonRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>) {
+    const button = buttonRefs.current[index];
+    if (button) {
+      button.scrollIntoView({
+        behavior: "smooth",
+        block: "center", 
+        inline: "center",
+      });
+    }
+  };
+
   return (
     <>
-      <h1 style={{padding: "4px", display: "flex", justifyContent: "center"}}>Weather App</h1>
+      <h1 style={{ padding: "4px", display: "flex", justifyContent: "center" }}>
+        Weather App
+      </h1>
       <div className="button-list">
         {savedCities.map((city: City, index: number) => {
           return (
             <button
               key={index}
-              className=""
               onClick={() => {
                 setSelectedCity(city);
                 setSelectedCityIndex(index);
+                scrollToButton(index, cityButtonRefs);
               }}
               style={{
                 backgroundColor:
-                  index === selectedCityIndex ? "#2980b9" : "lightgray",
+                  index === selectedCityIndex ? "#949494" : "lightgray",
               }}
+              ref={(el) => (cityButtonRefs.current[index] = el)} 
             >
               {city.name}
             </button>
@@ -169,12 +187,17 @@ function App() {
         })}
       </div>
       <div className="button-list">
-        {uniqueDays.map((day: string) => (
+        {uniqueDays.map((day: string, index: number) => (
           <button
+            key={index}
             style={{
-              backgroundColor: day == selectedDay ? "#2980b9" : "lightgray",
+              backgroundColor: day == selectedDay ? "#949494" : "lightgray",
             }}
-            onClick={() => setSelectedDay(day)}
+            onClick={() => {
+              setSelectedDay(day);
+              scrollToButton(index, dayButtonRefs);
+            }}
+            ref={(el) => (dayButtonRefs.current[index] = el)} 
           >
             {day}
           </button>
