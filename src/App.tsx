@@ -8,16 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function App() {
-  const [currentData, setCurrentData] = useState<HourWeather[]>([]);
-  const [uniqueDays, setUniqueDays] = useState<string[]>([]);
-  const [matchedCities, setMatchedCities] = useState<City[]>([]);
-  const [cityQuery, setCityQuery] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<City | null>();
-  const [selectedCityIndex, setSelectedCityIndex] = useState<number>(-1);
-  const [selectedDay, setSelectedDay] = useState<string>("");
-  const cityButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each city's button
-  const dayButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each day's button
-  const [savedCities, setSavedCities] = useState<City[]>([
+  const defaultCities: City[] = [
     {
       name: "Austin",
       state: "Texas",
@@ -39,7 +30,18 @@ function App() {
       latitude: 29.7601,
       longitude: -95.3701,
     },
-  ]);
+  ];
+
+  const [currentData, setCurrentData] = useState<HourWeather[]>([]);
+  const [uniqueDays, setUniqueDays] = useState<string[]>([]);
+  const [matchedCities, setMatchedCities] = useState<City[]>([]);
+  const [cityQuery, setCityQuery] = useState<string>("");
+  const [selectedCity, setSelectedCity] = useState<City | null>();
+  const [selectedCityIndex, setSelectedCityIndex] = useState<number>(-1);
+  const [selectedDay, setSelectedDay] = useState<string>("");
+  const cityButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each city's button
+  const dayButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each day's button
+  const [savedCities, setSavedCities] = useState<City[]>(defaultCities);
 
   useEffect(() => {
     setSelectedCityIndex(0);
@@ -147,9 +149,14 @@ function App() {
   }
 
   function handleDeleteCity(index: number) {
-    const isConfirmed = window.confirm(`Are you sure you want to remove ${savedCities[index].name}?`);
+    const isConfirmed = window.confirm(
+      `Are you sure you want to remove ${savedCities[index].name}?`
+    );
     if (isConfirmed) {
-      let cities: City[] = [...savedCities.slice(0, index), ...savedCities.slice(index + 1)]
+      let cities: City[] = [
+        ...savedCities.slice(0, index),
+        ...savedCities.slice(index + 1),
+      ];
       setSavedCities(cities);
       if (selectedCityIndex == index) {
         setSelectedCityIndex(0);
@@ -179,10 +186,14 @@ function App() {
               }}
               ref={(el) => (cityButtonRefs.current[index] = el)}
             >
-              <FontAwesomeIcon onClick={(e) => {
-            e.stopPropagation(); // Prevent triggering the button's click event
-            handleDeleteCity(index);
-          }} icon={faTrash} />&nbsp;&nbsp;{city.name}
+              <FontAwesomeIcon
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering the button's click event
+                  handleDeleteCity(index);
+                }}
+                icon={faTrash}
+              />
+              &nbsp;&nbsp;{city.name}
             </button>
           );
         })}
@@ -212,21 +223,25 @@ function App() {
         })}
       </div>
       <div className="button-list">
-        {savedCities.length > 0 ? uniqueDays.map((day: string, index: number) => (
-          <button
-            key={index}
-            style={{
-              backgroundColor: day == selectedDay ? "#949494" : "lightgray",
-            }}
-            onClick={() => {
-              setSelectedDay(day);
-              scrollToButton(index, dayButtonRefs);
-            }}
-            ref={(el) => (dayButtonRefs.current[index] = el)}
-          >
-            {day}
-          </button>
-        )) : <></>}
+        {savedCities.length > 0 ? (
+          uniqueDays.map((day: string, index: number) => (
+            <button
+              key={index}
+              style={{
+                backgroundColor: day == selectedDay ? "#949494" : "lightgray",
+              }}
+              onClick={() => {
+                setSelectedDay(day);
+                scrollToButton(index, dayButtonRefs);
+              }}
+              ref={(el) => (dayButtonRefs.current[index] = el)}
+            >
+              {day}
+            </button>
+          ))
+        ) : (
+          <></>
+        )}
       </div>
       {currentData
         ?.filter(
@@ -240,6 +255,18 @@ function App() {
         .map((hour: HourWeather, index: number) => (
           <WeatherListItem weather={hour} key={index} />
         ))}
+      <div className="d-flex justify-content-center align-items-center pt-2 pb-1" style={{borderTop: "1px solid lightgray"}}>
+        🛠️ Created by&nbsp;
+        <a href="https://github.com/barnetthan" target="_blank">
+          Barnett Han
+        </a>
+      </div>
+      <div className="d-flex justify-content-center align-items-center pb-2">
+        📊 All weather data from&nbsp;
+        <a href="https://open-meteo.com/" target="_blank">
+          Open-Meteo
+        </a>
+      </div>
     </>
   );
 }
