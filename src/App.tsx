@@ -36,22 +36,20 @@ function App() {
   const [uniqueDays, setUniqueDays] = useState<string[]>([]);
   const [matchedCities, setMatchedCities] = useState<City[]>([]);
   const [cityQuery, setCityQuery] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<City | null>();
-  const [selectedCityIndex, setSelectedCityIndex] = useState<number>(-1);
+  const [selectedCity, setSelectedCity] = useState<City | null>(defaultCities[0]);
+  const [selectedCityIndex, setSelectedCityIndex] = useState<number>(0);
   const [selectedDay, setSelectedDay] = useState<string>("");
-  const cityButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each city's button
-  const dayButtonRefs = useRef<(HTMLButtonElement | null)[]>([]); // Ref for each day's button
-  const [savedCities, setSavedCities] = useState<City[]>(defaultCities);
+  const cityButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const dayButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [savedCities, setSavedCities] = useState<City[]>([]);
 
   useEffect(() => {
-    setSelectedCityIndex(0);
-    setSelectedCity(savedCities[0]);
-    fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${savedCities[0]?.latitude}&longitude=${savedCities[0]?.longitude}&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&timezone=auto&current=apparent_temperature&wind_speed_unit=mph&precipitation_unit=inch`
-    )
-      .then((response) => response.json())
-      .then((data) => storeWeatherResults(data))
-      .catch((error) => console.error("Error fetching data:", error));
+    const cities = localStorage.getItem("savedCities");
+    if (cities && JSON.parse(cities)) {
+      setSavedCities(JSON.parse(cities));
+    } else {
+      setSavedCities(defaultCities);
+    }
   }, []);
 
   useEffect(() => {
@@ -132,6 +130,7 @@ function App() {
     setSelectedCity(city);
     setSelectedCityIndex(cities.length - 1);
     setCityQuery("");
+    localStorage.setItem("savedCities", JSON.stringify(cities));
   }
 
   function scrollToButton(
@@ -161,6 +160,11 @@ function App() {
       if (selectedCityIndex == index) {
         setSelectedCityIndex(0);
         setSelectedCity(cities[0]);
+      }
+      if (cities.length < 1) {
+        localStorage.removeItem("savedCities");
+      } else {
+        localStorage.setItem("savedCities", JSON.stringify(cities));
       }
     }
   }
@@ -256,7 +260,7 @@ function App() {
           <WeatherListItem weather={hour} key={index} />
         ))}
       <div className="d-flex justify-content-center align-items-center pt-2 pb-1" style={{borderTop: "1px solid lightgray"}}>
-        🛠️ Created by&nbsp;
+        🛠️ Built by&nbsp;
         <a href="https://github.com/barnetthan" target="_blank">
           Barnett Han
         </a>
