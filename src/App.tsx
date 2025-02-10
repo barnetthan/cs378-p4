@@ -6,6 +6,7 @@ import ResultItem from "./components/ResultItem";
 import WeatherListItem from "./components/WeatherListItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import TimeDisplay from "./components/TimeDisplay";
 
 function App() {
   const defaultCities: City[] = [
@@ -36,7 +37,9 @@ function App() {
   const [uniqueDays, setUniqueDays] = useState<string[]>([]);
   const [matchedCities, setMatchedCities] = useState<City[]>([]);
   const [cityQuery, setCityQuery] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<City | null>(defaultCities[0]);
+  const [selectedCity, setSelectedCity] = useState<City | null>(
+    defaultCities[0]
+  );
   const [selectedCityIndex, setSelectedCityIndex] = useState<number>(0);
   const [selectedDay, setSelectedDay] = useState<string>("");
   const cityButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -63,7 +66,7 @@ function App() {
 
   useEffect(() => {
     fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${selectedCity?.latitude}&longitude=${selectedCity?.longitude}&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&timezone=auto&current=apparent_temperature&wind_speed_unit=mph&precipitation_unit=inch`
+      `https://api.open-meteo.com/v1/forecast?latitude=${selectedCity?.latitude}&longitude=${selectedCity?.longitude}&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&timezone=auto&current=apparent_temperature&wind_speed_unit=mph&precipitation_unit=inch`
     )
       .then((response) => response.json())
       .then((data) => storeWeatherResults(data))
@@ -116,6 +119,7 @@ function App() {
           precip_inches: data.hourly.precipitation[i],
           wind_speed: data.hourly.wind_speed_10m[i],
           wind_direction: data.hourly.wind_direction_10m[i],
+          weather_code: data.hourly.weather_code[i],
         });
       }
     }
@@ -170,10 +174,36 @@ function App() {
   }
 
   return (
-    <>
+    <div className="weather-app">
       <h1 style={{ padding: "4px", display: "flex", justifyContent: "center" }}>
-        Weather App
+        Hourly Weather
       </h1>
+      <div style={{ padding: "0px 4px 4px 8px" }}>Add City:</div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <input
+          className="form-control"
+          type="text"
+          value={cityQuery}
+          placeholder="Search for a city..."
+          onChange={(e) => {
+            setCityQuery(e.target.value);
+          }}
+          style={{
+            width: "95%",
+            border: "0.5px solid #808080",
+          }}
+        />
+        {matchedCities.map((city: City) => {
+          return <ResultItem city={city} addCity={addCity} />;
+        })}
+      </div>
+
       <div className="button-list">
         {savedCities.map((city: City, index: number) => {
           return (
@@ -202,30 +232,7 @@ function App() {
           );
         })}
       </div>
-      <div style={{ padding: "0px 4px 4px 8px" }}>Add City:</div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <input
-          className="form-control"
-          type="text"
-          value={cityQuery}
-          placeholder="Search for a city..."
-          onChange={(e) => {
-            setCityQuery(e.target.value);
-          }}
-          style={{
-            width: "95%",
-          }}
-        />
-        {matchedCities.map((city: City) => {
-          return <ResultItem city={city} addCity={addCity} />;
-        })}
-      </div>
+
       <div className="button-list">
         {savedCities.length > 0 ? (
           uniqueDays.map((day: string, index: number) => (
@@ -259,7 +266,10 @@ function App() {
         .map((hour: HourWeather, index: number) => (
           <WeatherListItem weather={hour} key={index} />
         ))}
-      <div className="d-flex justify-content-center align-items-center pt-2 pb-1" style={{borderTop: "1px solid lightgray"}}>
+      <div
+        className="d-flex justify-content-center align-items-center pt-2 pb-1"
+        style={{ borderTop: "0.5px solid #808080" }}
+      >
         🛠️ Built by&nbsp;
         <a href="https://github.com/barnetthan" target="_blank">
           Barnett Han
@@ -271,7 +281,7 @@ function App() {
           Open-Meteo
         </a>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -5,6 +5,7 @@ export interface HourWeather {
   precip_inches: number;
   wind_speed: number;
   wind_direction: number;
+  weather_code: number;
 }
 
 export interface City {

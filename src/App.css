@@ -1,10 +1,11 @@
 .result-item {
   display: flex;
   justify-content: space-between;
-  border: 1px solid #ddd;
+  border: 0.5px solid #ddd;
   width: 95%;
   background-color: #f9f9f9;
   padding: 0px 10px 0px 10px;
+  border-radius: 5px;
 }
 
 .result-item:hover {
@@ -23,4 +24,9 @@
 .button-list button {
   padding: 8px 8px 8px 8px;
   color: black;
+}
+
+.weather-app {
+  background: linear-gradient(to bottom, #B3E5FC, #E0F7FA);
+  min-height: 100vh;
 }
