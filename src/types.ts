@@ -8,6 +8,15 @@ export interface HourWeather {
   weather_code: number;
 }
 
+export interface LiveWeather {
+  temperature: number;
+  temp_high: number;
+  temp_low: number;
+  temp_feels: number;
+  weather_code: number;
+  utc_offset_seconds: number;
+}
+
 export interface City {
   name: string;
   state: string | null;
@@ -21,6 +30,7 @@ export interface ResultItemProps {
   addCity: Function;
 }
 
-export interface WeatherListItemProps {
-  weather: HourWeather;
+export interface LiveWeatherDisplayProps {
+  weather: LiveWeather;
+  cityName: string;
 }

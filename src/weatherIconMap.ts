@@ -10,10 +10,31 @@ import {
   faSnowflake, 
   faCloudMeatball, 
   faBolt, 
-  faCloudSunRain 
+  faCloudSunRain, 
+  faQuestionCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
+// Written by ChatGPT
+const getWeatherIcon = (code: number) => {
+    let bestMatch = { description: "Unknown", icon: faQuestionCircle };
+
+    for (const key of Object.keys(weatherIconMap)
+      .map(Number)
+      .sort((a, b) => a - b)) {
+      if (code >= key) {
+        bestMatch = weatherIconMap[key]; // Update with the best match so far
+      } else {
+        break; // Stop once we exceed the number
+      }
+    }
+
+    return bestMatch;
+  };
+
+export { getWeatherIcon };
+
+// Written by ChatGPT
 const weatherIconMap: Record<number, { description: string; icon: IconDefinition }> = {
   0: { description: "Clear sky", icon: faSun },
   1: { description: "Partly cloudy", icon: faCloudSun },

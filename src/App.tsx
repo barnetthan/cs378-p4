@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { HourWeather, City } from "./types";
+import { HourWeather, LiveWeather, City } from "./types";
 import ResultItem from "./components/ResultItem";
 import WeatherListItem from "./components/WeatherListItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import TimeDisplay from "./components/TimeDisplay";
+import LiveWeatherDisplay from "./components/LiveWeatherDisplay";
+import Footer from "./components/Footer";
 
 function App() {
   const defaultCities: City[] = [
@@ -34,6 +35,7 @@ function App() {
   ];
 
   const [currentData, setCurrentData] = useState<HourWeather[]>([]);
+  const [liveData, setLiveData] = useState<LiveWeather | null>(null);
   const [uniqueDays, setUniqueDays] = useState<string[]>([]);
   const [matchedCities, setMatchedCities] = useState<City[]>([]);
   const [cityQuery, setCityQuery] = useState<string>("");
@@ -66,7 +68,7 @@ function App() {
 
   useEffect(() => {
     fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${selectedCity?.latitude}&longitude=${selectedCity?.longitude}&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&timezone=auto&current=apparent_temperature&wind_speed_unit=mph&precipitation_unit=inch`
+      `https://api.open-meteo.com/v1/forecast?latitude=${selectedCity?.latitude}&longitude=${selectedCity?.longitude}&current=temperature_2m,apparent_temperature,weather_code&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&timezone=auto&current=apparent_temperature&wind_speed_unit=mph&precipitation_unit=inch`
     )
       .then((response) => response.json())
       .then((data) => storeWeatherResults(data))
@@ -110,6 +112,10 @@ function App() {
 
   function storeWeatherResults(data: any) {
     let weather: HourWeather[] = [];
+    let day_high: number = -500;
+    let day_low: number = 500;
+
+    // store hourly data
     if (data.hourly && data.hourly.time.length > 0) {
       for (let i = 0; i < data.hourly.time.length; i++) {
         weather.push({
@@ -121,8 +127,28 @@ function App() {
           wind_direction: data.hourly.wind_direction_10m[i],
           weather_code: data.hourly.weather_code[i],
         });
+        if (i < 24) {
+          // current day
+          day_high = Math.max(day_high, data.hourly.temperature_2m[i]);
+          day_low = Math.min(day_low, data.hourly.temperature_2m[i]);
+        }
       }
     }
+
+    let liveWeather: LiveWeather | null = null;
+    // store live data
+    if (data.current) {
+      liveWeather = {
+        temperature: data.current.temperature_2m,
+        temp_high: day_high,
+        temp_low: day_low,
+        temp_feels: data.current.apparent_temperature,
+        weather_code: data.current.weather_code,
+        utc_offset_seconds: data.utc_offset_seconds,
+      }
+    }
+
+    setLiveData(liveWeather);
     setCurrentData(weather);
     scrollToButton(selectedCityIndex, cityButtonRefs);
   }
@@ -175,8 +201,8 @@ function App() {
 
   return (
     <div className="weather-app">
-      <h1 style={{ padding: "4px", display: "flex", justifyContent: "center" }}>
-        Hourly Weather
+      <h1 className="display-2" style={{ padding: "4px", display: "flex", justifyContent: "center" }}>
+        🌥️ SwiftWeather
       </h1>
       <div style={{ padding: "0px 4px 4px 8px" }}>Add City:</div>
       <div
@@ -232,7 +258,9 @@ function App() {
           );
         })}
       </div>
-
+      
+      {liveData && selectedCity ? <LiveWeatherDisplay weather={liveData} cityName={selectedCity.name}/> : <></>}
+  
       <div className="button-list">
         {savedCities.length > 0 ? (
           uniqueDays.map((day: string, index: number) => (
@@ -266,21 +294,7 @@ function App() {
         .map((hour: HourWeather, index: number) => (
           <WeatherListItem weather={hour} key={index} />
         ))}
-      <div
-        className="d-flex justify-content-center align-items-center pt-2 pb-1"
-        style={{ borderTop: "0.5px solid #808080" }}
-      >
-        🛠️ Built by&nbsp;
-        <a href="https://github.com/barnetthan" target="_blank">
-          Barnett Han
-        </a>
-      </div>
-      <div className="d-flex justify-content-center align-items-center pb-2">
-        📊 All weather data from&nbsp;
-        <a href="https://open-meteo.com/" target="_blank">
-          Open-Meteo
-        </a>
-      </div>
+      <Footer/>
     </div>
   );
 }

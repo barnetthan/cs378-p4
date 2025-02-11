@@ -1,28 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { WeatherListItemProps } from "../types";
+import { HourWeather } from "../types";
 import {
   faArrowUp,
   faDroplet,
-  faQuestionCircle,
   faWind,
 } from "@fortawesome/free-solid-svg-icons";
-import weatherIconMap from "../weatherIconMap";
+import { getWeatherIcon } from "../weatherIconMap";
 
-const getWeatherIcon = (code: number) => {
-  let bestMatch = { description: "Unknown", icon: faQuestionCircle };
-
-  for (const key of Object.keys(weatherIconMap).map(Number).sort((a, b) => a - b)) {
-    if (code >= key) {
-      bestMatch = weatherIconMap[key]; // Update with the best match so far
-    } else {
-      break; // Stop once we exceed the number
-    }
-  }
-
-  return bestMatch;
-};
-
-function WeatherListItem({ weather }: WeatherListItemProps) {
+function WeatherListItem( {weather} : { weather : HourWeather}) {
   return (
     <div
       className="container"
@@ -39,7 +24,7 @@ function WeatherListItem({ weather }: WeatherListItemProps) {
         </div>
         <div className="row align-items-center col-9 text-center p-0">
           <div className="col-6 text-center p-0">
-            <h3><FontAwesomeIcon icon={getWeatherIcon(weather.weather_code).icon} /> {weather.temperature}° F</h3>
+            <h3 className="display-6"><FontAwesomeIcon icon={getWeatherIcon(weather.weather_code).icon} /> {weather.temperature}° F</h3>
           </div>
           <div className="col-6 text-center p-0">
             <div className="text-center">
