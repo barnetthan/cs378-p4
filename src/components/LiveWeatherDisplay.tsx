@@ -24,7 +24,7 @@ function LiveWeatherDisplay({ weather, cityName }: LiveWeatherDisplayProps) {
 
       <div className="fs-5">
         <TimeDisplay utc_offset_seconds={weather.utc_offset_seconds} /> | Feels
-        like {weather.temp_feels}° F
+        like: {weather.temp_feels}° F
       </div>
     </div>
   );

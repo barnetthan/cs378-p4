@@ -40,7 +40,10 @@ function App() {
   const [matchedCities, setMatchedCities] = useState<City[]>([]);
   const [cityQuery, setCityQuery] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<City | null>(
-    defaultCities[0]
+    localStorage.getItem("savedCities") &&
+      JSON.parse(localStorage.getItem("savedCities")!)
+      ? JSON.parse(localStorage.getItem("savedCities")!)[0]
+      : defaultCities[0]
   );
   const [selectedCityIndex, setSelectedCityIndex] = useState<number>(0);
   const [selectedDay, setSelectedDay] = useState<string>("");
@@ -145,7 +148,7 @@ function App() {
         temp_feels: data.current.apparent_temperature,
         weather_code: data.current.weather_code,
         utc_offset_seconds: data.utc_offset_seconds,
-      }
+      };
     }
 
     setLiveData(liveWeather);
@@ -201,7 +204,10 @@ function App() {
 
   return (
     <div className="weather-app">
-      <h1 className="display-2" style={{ padding: "4px", display: "flex", justifyContent: "center" }}>
+      <h1
+        className="display-2"
+        style={{ padding: "4px", display: "flex", justifyContent: "center" }}
+      >
         🌥️ SwiftWeather
       </h1>
       <div style={{ padding: "0px 4px 4px 8px" }}>Add City:</div>
@@ -258,9 +264,13 @@ function App() {
           );
         })}
       </div>
-      
-      {liveData && selectedCity ? <LiveWeatherDisplay weather={liveData} cityName={selectedCity.name}/> : <></>}
-  
+
+      {liveData && selectedCity ? (
+        <LiveWeatherDisplay weather={liveData} cityName={selectedCity.name} />
+      ) : (
+        <></>
+      )}
+
       <div className="button-list">
         {savedCities.length > 0 ? (
           uniqueDays.map((day: string, index: number) => (
@@ -294,7 +304,7 @@ function App() {
         .map((hour: HourWeather, index: number) => (
           <WeatherListItem weather={hour} key={index} />
         ))}
-      <Footer/>
+      <Footer />
     </div>
   );
 }
