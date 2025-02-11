@@ -205,7 +205,7 @@ function App() {
   return (
     <div className="weather-app">
       <h1
-        className="display-2"
+        className="display-6"
         style={{ padding: "4px", display: "flex", justifyContent: "center" }}
       >
         🌥️ SwiftWeather

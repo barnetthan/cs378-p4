@@ -5,9 +5,8 @@ import {
   faDroplet,
   faWind,
 } from "@fortawesome/free-solid-svg-icons";
-import { getWeatherIcon } from "../weatherIconMap";
 
-function WeatherListItem( {weather} : { weather : HourWeather}) {
+function WeatherListItem({ weather }: { weather: HourWeather }) {
   return (
     <div
       className="container"
@@ -15,7 +14,7 @@ function WeatherListItem( {weather} : { weather : HourWeather}) {
     >
       <div className="row align-items-center">
         <div className="col-3">
-          <h6 style={{paddingLeft: "8px"}}>
+          <h6 style={{ paddingLeft: "8px" }}>
             {weather.date.toLocaleTimeString("en-US", {
               hour: "numeric",
               hour12: true,
@@ -24,7 +23,9 @@ function WeatherListItem( {weather} : { weather : HourWeather}) {
         </div>
         <div className="row align-items-center col-9 text-center p-0">
           <div className="col-6 text-center p-0">
-            <h3 className="display-6"><FontAwesomeIcon icon={getWeatherIcon(weather.weather_code).icon} /> {weather.temperature}° F</h3>
+            <h3 className="display-6">
+               {weather.temperature}° F
+            </h3>
           </div>
           <div className="col-6 text-center p-0">
             <div className="text-center">

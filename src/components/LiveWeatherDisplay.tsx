@@ -1,10 +1,8 @@
 import { LiveWeatherDisplayProps } from "../types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TimeDisplay from "./TimeDisplay";
-import { getWeatherIcon } from "../weatherIconMap";
+import { getWeatherIcon } from "./WeatherIconMap";
 
 function LiveWeatherDisplay({ weather, cityName }: LiveWeatherDisplayProps) {
-
   return (
     <div
       className="text-center container"
@@ -13,8 +11,7 @@ function LiveWeatherDisplay({ weather, cityName }: LiveWeatherDisplayProps) {
       <h1 className="display-1">{cityName} </h1>
       <div className="d-flex align-items-center justify-content-center">
         <h1 className="display-2 me-4">
-          <FontAwesomeIcon icon={getWeatherIcon(weather.weather_code).icon} />{" "}
-          {weather.temperature}° F
+          {getWeatherIcon(weather.weather_code)} {weather.temperature}° F
         </h1>
         <div>
           <div>High: {weather.temp_high}° F</div>
