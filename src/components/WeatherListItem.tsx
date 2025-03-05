@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HourWeather } from "../types";
 import {
-  faArrowUp,
+  faArrowDown,
   faDroplet,
   faWind,
 } from "@fortawesome/free-solid-svg-icons";
@@ -32,7 +32,7 @@ function WeatherListItem({ weather }: { weather: HourWeather }) {
               <FontAwesomeIcon icon={faWind} style={{ color: "#696969" }} />{" "}
               {weather.wind_speed} mph &nbsp;
               <FontAwesomeIcon
-                icon={faArrowUp}
+                icon={faArrowDown}
                 style={{
                   transform: `rotate(${weather.wind_direction}deg)`,
                   fontSize: "16px",
