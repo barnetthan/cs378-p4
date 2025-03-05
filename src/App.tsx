@@ -231,9 +231,20 @@ function App() {
             border: "0.5px solid #808080",
           }}
         />
-        {matchedCities.map((city: City) => {
-          return <ResultItem city={city} addCity={addCity} />;
-        })}
+        {cityQuery.length > 0 ? (
+          matchedCities.length > 0 ? (
+            matchedCities.map((city: City) => {
+              return <ResultItem city={city} addCity={addCity} />;
+            })
+          ) : (
+            <div className="d-flex align-items-center result-item">
+              <span>No results for "{cityQuery}"</span>
+              <span className="btn btn-s invisible">+</span>
+            </div>
+          )
+        ) : (
+          <></>
+        )}
       </div>
 
       <div className="button-list">
